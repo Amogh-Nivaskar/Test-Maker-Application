@@ -5,6 +5,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.TestModel = void 0;
 const mongoose_1 = __importDefault(require("mongoose"));
+const testStatus_1 = require("../utils/enums/testStatus");
 const Schema = mongoose_1.default.Schema;
 const TestSchema = new Schema({
     name: {
@@ -22,8 +23,8 @@ const TestSchema = new Schema({
     },
     status: {
         type: String,
-        enum: ["active", "inactive"],
-        default: "inactive",
+        enum: testStatus_1.TestStatus,
+        default: testStatus_1.TestStatus.Inactive,
     },
     questions: [
         {

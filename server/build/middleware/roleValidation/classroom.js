@@ -14,7 +14,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.validateSendingClassroomInviteAuthorization = exports.validateCreatingClassroomAuthorization = void 0;
 const organization_1 = __importDefault(require("../../services/organization"));
-const roles_1 = require("../../utils/roles");
+const roles_1 = require("../../utils/enums/roles");
 const classroom_1 = __importDefault(require("../../services/classroom"));
 function validateCreatingClassroomAuthorization(req, res, next) {
     return __awaiter(this, void 0, void 0, function* () {

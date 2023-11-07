@@ -4,7 +4,7 @@ import { IRecievedInvite, IUser } from "../interfaces/user";
 import { Types } from "mongoose";
 import { IOrganization } from "../interfaces/organization";
 import { OrganizationModel } from "../models/organization";
-import { UserRole } from "../utils/roles";
+import { UserRole } from "../utils/enums/roles";
 import { IInvite } from "../interfaces/invite";
 import { ClassroomModel } from "../models/classroom";
 import { ObjectId } from "mongodb";

@@ -1,6 +1,6 @@
 import mongoose, { Types } from "mongoose";
 import { OrganizationModel } from "../models/organization";
-import { UserRole } from "../utils/roles";
+import { UserRole } from "../utils/enums/roles";
 import { IOrganization } from "../interfaces/organization";
 import { IUser } from "../interfaces/user";
 import { IClassroom } from "../interfaces/classroom";

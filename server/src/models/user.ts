@@ -1,6 +1,6 @@
 import mongoose, { Model, Schema } from "mongoose";
 import { IUser } from "../interfaces/user";
-import { UserRole } from "../utils/roles";
+import { UserRole } from "../utils/enums/roles";
 
 const UserSchema: Schema = new Schema<IUser>({
   name: {

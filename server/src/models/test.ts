@@ -1,4 +1,5 @@
 import mongoose from "mongoose";
+import { TestStatus } from "../utils/enums/testStatus";
 const Schema = mongoose.Schema;
 
 const TestSchema = new Schema({
@@ -17,8 +18,8 @@ const TestSchema = new Schema({
   },
   status: {
     type: String,
-    enum: ["active", "inactive"],
-    default: "inactive",
+    enum: TestStatus,
+    default: TestStatus.Inactive,
   },
   questions: [
     {

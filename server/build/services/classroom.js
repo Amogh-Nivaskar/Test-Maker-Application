@@ -13,7 +13,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const classroom_1 = require("../models/classroom");
-const roles_1 = require("../utils/roles");
+const roles_1 = require("../utils/enums/roles");
 const organization_1 = __importDefault(require("./organization"));
 const user_1 = require("../models/user");
 const user_2 = __importDefault(require("./user"));

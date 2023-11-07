@@ -25,7 +25,7 @@ var __importStar = (this && this.__importStar) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ClassroomModel = void 0;
 const mongoose_1 = __importStar(require("mongoose"));
-const roles_1 = require("../utils/roles");
+const roles_1 = require("../utils/enums/roles");
 const ClassroomSchema = new mongoose_1.Schema({
     name: {
         type: String,

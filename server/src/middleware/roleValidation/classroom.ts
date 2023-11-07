@@ -2,7 +2,7 @@ import { NextFunction, Request, Response } from "express";
 import OrganizationService from "../../services/organization";
 import { Types } from "mongoose";
 import { IOrganization } from "../../interfaces/organization";
-import { UserRole } from "../../utils/roles";
+import { UserRole } from "../../utils/enums/roles";
 import ClassroomService from "../../services/classroom";
 import { IClassroom } from "../../interfaces/classroom";
 

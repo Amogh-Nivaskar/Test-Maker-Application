@@ -15,7 +15,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const user_1 = require("../models/user");
 const organization_1 = require("../models/organization");
-const roles_1 = require("../utils/roles");
+const roles_1 = require("../utils/enums/roles");
 const classroom_1 = require("../models/classroom");
 class UserService {
     constructor(user) {

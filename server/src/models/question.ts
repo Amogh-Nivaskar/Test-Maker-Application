@@ -1,5 +1,5 @@
 import mongoose from "mongoose";
-import { QuestionTypes } from "../utils/questionsTypes";
+import { QuestionTypes } from "../utils/enums/questionsTypes";
 const Schema = mongoose.Schema;
 
 const QuestionSchema = new Schema({

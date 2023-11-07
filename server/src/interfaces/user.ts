@@ -1,7 +1,7 @@
 import { Types } from "mongoose";
 import { IClassroom } from "./classroom";
 import { IOrganization } from "./organization";
-import { UserRole } from "../utils/roles";
+import { UserRole } from "../utils/enums/roles";
 
 export interface IRecievedInvite {
   from: IOrganization | IOrganization["_id"] | IClassroom | IClassroom["_id"];

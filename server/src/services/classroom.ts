@@ -1,6 +1,6 @@
 import mongoose, { Types } from "mongoose";
 import { ClassroomModel } from "../models/classroom";
-import { UserRole } from "../utils/roles";
+import { UserRole } from "../utils/enums/roles";
 import OrganizationService from "./organization";
 import { IClassroom } from "../interfaces/classroom";
 import { IOrganization } from "../interfaces/organization";
