@@ -19,7 +19,7 @@ const mongodbAtlas_1 = require("./connections/mongodbAtlas");
 const user_1 = __importDefault(require("./routes/user"));
 const organization_1 = __importDefault(require("./routes/organization"));
 const classroom_1 = __importDefault(require("./routes/classroom"));
-const postgresDB_1 = require("./connections/postgresDB");
+// import { connectToPostgresDB } from "./connections/postgresDB";
 dotenv_1.default.config();
 const app = (0, express_1.default)();
 const PORT = Number(process.env.PORT) || 3000;
@@ -35,7 +35,7 @@ app.use("/organization/:organizationId/classroom", classroom_1.default);
 function init() {
     return __awaiter(this, void 0, void 0, function* () {
         yield (0, mongodbAtlas_1.connectToMongoDB)();
-        yield (0, postgresDB_1.connectToPostgresDB)();
+        // await connectToPostgresDB();
         app.listen(PORT, () => console.log(`Server is running on PORT: ${PORT}`));
     });
 }

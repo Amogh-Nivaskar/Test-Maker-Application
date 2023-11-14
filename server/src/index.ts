@@ -6,7 +6,7 @@ import { connectToMongoDB } from "./connections/mongodbAtlas";
 import UserRoutes from "./routes/user";
 import OrganizationRoutes from "./routes/organization";
 import ClassroomRoutes from "./routes/classroom";
-import { connectToPostgresDB } from "./connections/postgresDB";
+// import { connectToPostgresDB } from "./connections/postgresDB";
 
 dotenv.config();
 const app = express();
@@ -28,7 +28,7 @@ app.use("/organization/:organizationId/classroom", ClassroomRoutes);
 async function init() {
   await connectToMongoDB();
 
-  await connectToPostgresDB();
+  // await connectToPostgresDB();
 
   app.listen(PORT, () => console.log(`Server is running on PORT: ${PORT}`));
 }

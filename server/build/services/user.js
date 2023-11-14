@@ -76,9 +76,11 @@ class UserService {
                 _id: user._id,
                 name: user.name,
                 email: user.email,
-            }, String(process.env.JWT_SECRET), {
-                expiresIn: "1d",
-            });
+            }, String(process.env.JWT_SECRET)
+            // {
+            //   expiresIn: "1d",
+            // }
+            );
             return accessToken;
         });
     }

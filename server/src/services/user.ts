@@ -92,10 +92,10 @@ class UserService implements IUser {
         name: user.name,
         email: user.email,
       },
-      String(process.env.JWT_SECRET),
-      {
-        expiresIn: "1d",
-      }
+      String(process.env.JWT_SECRET)
+      // {
+      //   expiresIn: "1d",
+      // }
     );
 
     return accessToken;

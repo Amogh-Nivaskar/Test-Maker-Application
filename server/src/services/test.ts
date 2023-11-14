@@ -5,6 +5,8 @@ import { IClassroom } from "../interfaces/classroom";
 import { IQuestion } from "../interfaces/question";
 import { IResponse } from "../interfaces/response";
 import { TestStatus } from "../utils/enums/testStatus";
+import ClassroomService from "./classroom";
+import { TestModel } from "../models/test";
 
 class Test implements ITest {
   _id: Types.ObjectId;
@@ -16,7 +18,7 @@ class Test implements ITest {
   questions: Array<IQuestion> | Array<IQuestion["_id"]>;
   responses: Array<IResponse> | Array<IResponse["_id"]>;
 
-  public constructor(test: ITest) {
+  public constructor(test: any) {
     this._id = test._id;
     this.name = test.name;
     this.createdBy = test.createdBy;
@@ -25,6 +27,18 @@ class Test implements ITest {
     this.status = test.status;
     this.questions = test.questions;
     this.responses = test.responses;
+  }
+
+  public async createTest() {
+    const classroom = await ClassroomService.getClassroomById(
+      this.classroom as Types.ObjectId
+    );
+
+    if (!classroom) throw new Error("Classroom not found");
+
+    const test = new TestModel(this);
+
+    classroom.tests.push(test._id);
   }
 }
 

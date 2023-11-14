@@ -16,6 +16,7 @@ const organization_1 = require("../models/organization");
 const roles_1 = require("../utils/enums/roles");
 const user_1 = require("../models/user");
 const user_2 = __importDefault(require("./user"));
+const postgresDB_1 = __importDefault(require("../connections/postgresDB"));
 class OrganizationService {
     constructor(organization) {
         this._id = organization._id;
@@ -146,6 +147,12 @@ class OrganizationService {
             this.invitesSent = organization.invitesSent;
             user.organizationInvites.push({ from: this._id, role });
             yield user.save();
+        });
+    }
+    static addTable(createTableQuery, populateTableQuery) {
+        return __awaiter(this, void 0, void 0, function* () {
+            yield postgresDB_1.default.query(createTableQuery);
+            yield postgresDB_1.default.query(populateTableQuery);
         });
     }
 }

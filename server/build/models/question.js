@@ -16,7 +16,7 @@ const QuestionSchema = new Schema({
     type: {
         type: String,
         enum: questionsTypes_1.QuestionTypes,
-        default: "text-ans",
+        default: questionsTypes_1.QuestionTypes.TextAns,
     },
     marks: Number,
     modelAns: Schema.Types.Mixed,

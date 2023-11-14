@@ -7,6 +7,7 @@ import { IClassroom } from "../interfaces/classroom";
 import { IInvite } from "../interfaces/invite";
 import { UserModel } from "../models/user";
 import UserService from "./user";
+import Postgres from "../connections/postgresDB";
 
 class OrganizationService implements IOrganization {
   _id: Types.ObjectId;
@@ -17,7 +18,7 @@ class OrganizationService implements IOrganization {
   classrooms: Array<IClassroom> | Array<IClassroom["_id"]>;
   invitesSent: Array<IInvite>;
 
-  public constructor(organization: IOrganization) {
+  public constructor(organization: any) {
     this._id = organization._id;
     this.name = organization.name;
     this.admin = organization.admin;
@@ -155,6 +156,14 @@ class OrganizationService implements IOrganization {
 
     user.organizationInvites.push({ from: this._id, role });
     await user.save();
+  }
+
+  public static async addTable(
+    createTableQuery: string,
+    populateTableQuery: string
+  ) {
+    await Postgres.query(createTableQuery);
+    await Postgres.query(populateTableQuery);
   }
 
   // TODO -  delete org
