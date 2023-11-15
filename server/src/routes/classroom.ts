@@ -1,7 +1,12 @@
 import express from "express";
 import { validateUserAuthentication } from "../middleware/authentication";
-import { createClassroom, sendClassroomInvite } from "../controllers/classroom";
 import {
+  createClassroom,
+  createTest,
+  sendClassroomInvite,
+} from "../controllers/classroom";
+import {
+  validateCreateTestAuthorization,
   validateCreatingClassroomAuthorization,
   validateSendingClassroomInviteAuthorization,
 } from "../middleware/roleValidation/classroom";
@@ -15,10 +20,17 @@ router.post(
   createClassroom
 );
 router.post(
-  "/sendInvite/:classroomId",
+  "/:classroomId/sendInvite",
   validateUserAuthentication,
   validateSendingClassroomInviteAuthorization,
   sendClassroomInvite
+);
+
+router.post(
+  "/:classroomId/createTest",
+  validateUserAuthentication,
+  validateCreateTestAuthorization,
+  createTest
 );
 
 export default router;

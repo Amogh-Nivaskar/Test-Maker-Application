@@ -12,7 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.validateSendingClassroomInviteAuthorization = exports.validateCreatingClassroomAuthorization = void 0;
+exports.validateCreateTestAuthorization = exports.validateSendingClassroomInviteAuthorization = exports.validateCreatingClassroomAuthorization = void 0;
 const organization_1 = __importDefault(require("../../services/organization"));
 const roles_1 = require("../../utils/enums/roles");
 const classroom_1 = __importDefault(require("../../services/classroom"));
@@ -66,4 +66,27 @@ function validateSendingClassroomInviteAuthorization(req, res, next) {
     });
 }
 exports.validateSendingClassroomInviteAuthorization = validateSendingClassroomInviteAuthorization;
+function validateCreateTestAuthorization(req, res, next) {
+    return __awaiter(this, void 0, void 0, function* () {
+        try {
+            const user = req.user;
+            const { organizationId, classroomId } = req.params;
+            const classroom = yield classroom_1.default.getClassroomById(classroomId);
+            const classroomService = new classroom_1.default(classroom);
+            const userClassroomRole = yield classroomService.getClassroomRole(user._id);
+            if (userClassroomRole === roles_1.UserRole.Teacher) {
+                next();
+            }
+            else {
+                return res.status(401).json({
+                    message: "Access Denied. User needs to be a classroom's teacher create test",
+                });
+            }
+        }
+        catch (error) {
+            return res.status(400).json({ message: error.message });
+        }
+    });
+}
+exports.validateCreateTestAuthorization = validateCreateTestAuthorization;
 //# sourceMappingURL=classroom.js.map

@@ -2,7 +2,6 @@ import { Types } from "mongoose";
 import { Response, Request } from "express";
 import OrganizationService from "../services/organization";
 import { IOrganization } from "../interfaces/organization";
-import Postgres from "../connections/postgresDB";
 
 export async function createOrganization(req: Request, res: Response) {
   try {

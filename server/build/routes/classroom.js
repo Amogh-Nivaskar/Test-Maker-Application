@@ -9,6 +9,7 @@ const classroom_1 = require("../controllers/classroom");
 const classroom_2 = require("../middleware/roleValidation/classroom");
 const router = express_1.default.Router({ mergeParams: true });
 router.post("/", authentication_1.validateUserAuthentication, classroom_2.validateCreatingClassroomAuthorization, classroom_1.createClassroom);
-router.post("/sendInvite/:classroomId", authentication_1.validateUserAuthentication, classroom_2.validateSendingClassroomInviteAuthorization, classroom_1.sendClassroomInvite);
+router.post("/:classroomId/sendInvite", authentication_1.validateUserAuthentication, classroom_2.validateSendingClassroomInviteAuthorization, classroom_1.sendClassroomInvite);
+router.post("/:classroomId/createTest", authentication_1.validateUserAuthentication, classroom_2.validateCreateTestAuthorization, classroom_1.createTest);
 exports.default = router;
 //# sourceMappingURL=classroom.js.map

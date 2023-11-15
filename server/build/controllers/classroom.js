@@ -12,8 +12,9 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.sendClassroomInvite = exports.createClassroom = void 0;
+exports.createTest = exports.sendClassroomInvite = exports.createClassroom = void 0;
 const classroom_1 = __importDefault(require("../services/classroom"));
+const test_1 = __importDefault(require("../services/test"));
 function createClassroom(req, res) {
     return __awaiter(this, void 0, void 0, function* () {
         try {
@@ -50,4 +51,26 @@ function sendClassroomInvite(req, res) {
     });
 }
 exports.sendClassroomInvite = sendClassroomInvite;
+function createTest(req, res) {
+    return __awaiter(this, void 0, void 0, function* () {
+        try {
+            const user = req.user;
+            const { classroomId, organizationId } = req.params;
+            const { test } = req.body;
+            const outputs = yield test_1.default.checkTest(test);
+            const testService = new test_1.default(test);
+            testService.createTest(outputs);
+            return res
+                .status(201)
+                .json({ message: "Created Test Successfully", outputs });
+        }
+        catch (error) {
+            console.log(error);
+            return res
+                .status(400)
+                .json({ message: error.message, errorQuestionIdx: error.questionIdx });
+        }
+    });
+}
+exports.createTest = createTest;
 //# sourceMappingURL=classroom.js.map

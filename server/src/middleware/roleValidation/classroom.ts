@@ -81,3 +81,35 @@ export async function validateSendingClassroomInviteAuthorization(
     return res.status(400).json({ message: error.message });
   }
 }
+
+export async function validateCreateTestAuthorization(
+  req: Request,
+  res: Response,
+  next: NextFunction
+) {
+  try {
+    const user = req.user;
+    const { organizationId, classroomId } = req.params;
+
+    const classroom = await ClassroomService.getClassroomById(
+      classroomId as unknown as Types.ObjectId
+    );
+
+    const classroomService = new ClassroomService(
+      classroom as unknown as IClassroom
+    );
+
+    const userClassroomRole = await classroomService.getClassroomRole(user._id);
+
+    if (userClassroomRole === UserRole.Teacher) {
+      next();
+    } else {
+      return res.status(401).json({
+        message:
+          "Access Denied. User needs to be a classroom's teacher create test",
+      });
+    }
+  } catch (error: any) {
+    return res.status(400).json({ message: error.message });
+  }
+}
