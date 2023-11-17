@@ -28,6 +28,8 @@ const test_1 = require("../models/test");
 const questionsTypes_1 = require("../utils/enums/questionsTypes");
 const question_1 = __importDefault(require("./question"));
 const question_2 = require("../models/question");
+const classroom_2 = require("../models/classroom");
+const roles_1 = require("../utils/enums/roles");
 class TestService {
     constructor(test) {
         this._id = test._id;
@@ -63,6 +65,14 @@ class TestService {
             yield classroom.save();
         });
     }
+    static getTestById(testId) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const test = yield test_1.TestModel.findById(testId);
+            if (!test)
+                throw new Error("Test Not Found");
+            return test;
+        });
+    }
     static checkTest(test) {
         return __awaiter(this, void 0, void 0, function* () {
             const questions = test === null || test === void 0 ? void 0 : test.questions;
@@ -76,6 +86,26 @@ class TestService {
             });
             const outputs = yield Promise.all(questionsPromises);
             return outputs;
+        });
+    }
+    checkIfStudentCanGiveTest(userId) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const classroomId = this.classroom;
+            const classroom = yield classroom_2.ClassroomModel.findById(classroomId);
+            const classroomService = new classroom_1.default(classroom);
+            const userRole = yield classroomService.getClassroomRole(userId);
+            if (userRole === roles_1.UserRole.Student)
+                return true;
+            return false;
+        });
+    }
+    addTestResponse(responseId) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const test = yield test_1.TestModel.findById(this._id);
+            if (!test)
+                throw new Error("Test Not Found");
+            test.responses.push(responseId);
+            yield test.save();
         });
     }
 }

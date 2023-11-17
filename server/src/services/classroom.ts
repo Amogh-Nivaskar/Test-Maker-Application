@@ -21,7 +21,7 @@ class ClassroomService implements IClassroom {
   tests: Array<ITest> | Array<ITest["_id"]>;
   invitesSent: Array<IInvite>;
 
-  public constructor(classroom: IClassroom) {
+  public constructor(classroom: any) {
     this._id = classroom._id;
     this.name = classroom.name;
     this.organization = classroom.organization;

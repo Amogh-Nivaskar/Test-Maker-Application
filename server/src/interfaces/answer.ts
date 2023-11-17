@@ -1,3 +1,4 @@
+import { Types } from "mongoose";
 import { IQuestion } from "./question";
 
 interface ISQLAnswer {
@@ -8,7 +9,8 @@ interface ISQLAnswer {
 export type answerTypes = string | number | number[] | ISQLAnswer;
 
 export interface IAnswer {
-  question: IQuestion;
+  _id: Types.ObjectId;
+  question: IQuestion | IQuestion["_id"];
   answer: answerTypes;
   isCorrect: boolean;
 }

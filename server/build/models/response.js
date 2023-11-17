@@ -5,6 +5,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ResponseModel = void 0;
 const mongoose_1 = __importDefault(require("mongoose"));
+const responseStatus_1 = require("../utils/enums/responseStatus");
 const Schema = mongoose_1.default.Schema;
 const ResponseSchema = new Schema({
     marksScored: {
@@ -21,15 +22,15 @@ const ResponseSchema = new Schema({
         ref: "Test",
         required: true,
     },
+    status: {
+        type: String,
+        enum: responseStatus_1.ResponseStatus,
+        default: responseStatus_1.ResponseStatus.Ongoing,
+    },
     answers: [
         {
-            question: {
-                type: Schema.Types.ObjectId,
-                ref: "Question",
-                required: true,
-            },
-            answer: Schema.Types.Mixed,
-            isCorrect: Boolean,
+            type: Schema.Types.ObjectId,
+            ref: "Answer",
         },
     ],
 });

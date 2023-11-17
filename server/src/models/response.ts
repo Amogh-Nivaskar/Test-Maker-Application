@@ -1,4 +1,5 @@
 import mongoose from "mongoose";
+import { ResponseStatus } from "../utils/enums/responseStatus";
 const Schema = mongoose.Schema;
 
 const ResponseSchema = new Schema({
@@ -16,15 +17,15 @@ const ResponseSchema = new Schema({
     ref: "Test",
     required: true,
   },
+  status: {
+    type: String,
+    enum: ResponseStatus,
+    default: ResponseStatus.Ongoing,
+  },
   answers: [
     {
-      question: {
-        type: Schema.Types.ObjectId,
-        ref: "Question",
-        required: true,
-      },
-      answer: Schema.Types.Mixed,
-      isCorrect: Boolean,
+      type: Schema.Types.ObjectId,
+      ref: "Answer",
     },
   ],
 });

@@ -10,6 +10,8 @@ import { TestModel } from "../models/test";
 import { QuestionTypes } from "../utils/enums/questionsTypes";
 import QuestionService from "./question";
 import { QuestionModel } from "../models/question";
+import { ClassroomModel } from "../models/classroom";
+import { UserRole } from "../utils/enums/roles";
 
 class TestService implements ITest {
   _id: Types.ObjectId;
@@ -68,6 +70,12 @@ class TestService implements ITest {
     await classroom.save();
   }
 
+  public static async getTestById(testId: Types.ObjectId) {
+    const test = await TestModel.findById(testId);
+    if (!test) throw new Error("Test Not Found");
+    return test;
+  }
+
   public static async checkTest(test: any) {
     const questions = test?.questions;
 
@@ -84,6 +92,23 @@ class TestService implements ITest {
 
     const outputs = await Promise.all(questionsPromises);
     return outputs;
+  }
+
+  public async checkIfStudentCanGiveTest(userId: Types.ObjectId) {
+    const classroomId = this.classroom;
+    const classroom = await ClassroomModel.findById(classroomId);
+    const classroomService = new ClassroomService(classroom);
+
+    const userRole = await classroomService.getClassroomRole(userId);
+    if (userRole === UserRole.Student) return true;
+    return false;
+  }
+
+  public async addTestResponse(responseId: Types.ObjectId) {
+    const test = await TestModel.findById(this._id);
+    if (!test) throw new Error("Test Not Found");
+    test.responses.push(responseId);
+    await test.save();
   }
 }
 
