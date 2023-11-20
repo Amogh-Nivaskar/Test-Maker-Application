@@ -12,6 +12,9 @@ import QuestionService from "./question";
 import { QuestionModel } from "../models/question";
 import { ClassroomModel } from "../models/classroom";
 import { UserRole } from "../utils/enums/roles";
+import { error } from "console";
+import { ResponseService } from "./response";
+import { ResponseStatus } from "../utils/enums/responseStatus";
 
 class TestService implements ITest {
   _id: Types.ObjectId;
@@ -22,6 +25,7 @@ class TestService implements ITest {
   status: TestStatus;
   questions: Array<IQuestion> | Array<IQuestion["_id"]>;
   responses: Array<IResponse> | Array<IResponse["_id"]>;
+  totalMarks: number;
 
   public constructor(test: any) {
     this._id = test._id;
@@ -32,6 +36,7 @@ class TestService implements ITest {
     this.status = test.status;
     this.questions = test.questions;
     this.responses = test.responses;
+    this.totalMarks = test.totalMarks;
   }
 
   public async createTest(outputs: any) {
@@ -109,6 +114,25 @@ class TestService implements ITest {
     if (!test) throw new Error("Test Not Found");
     test.responses.push(responseId);
     await test.save();
+  }
+
+  public async evaluateTestResponses() {
+    const test = await TestModel.findById(this._id).populate("responses");
+
+    if (!test) throw new Error("Test Not Found");
+
+    const evaluatedResponsesPromises = test.responses.map((response: any) => {
+      if (response.status === ResponseStatus.Submitted) {
+        const responseService = new ResponseService(response);
+        responseService.evaluateResponse();
+      }
+    });
+
+    if (evaluatedResponsesPromises) {
+      await Promise.all(evaluatedResponsesPromises);
+    } else {
+      throw new Error("Error in Evaluating Responses");
+    }
   }
 }
 

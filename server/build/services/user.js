@@ -144,9 +144,15 @@ class UserService {
             }
             // CHECK
             classroom.invitesSent = classroom.invitesSent.filter((invite) => invite.user.toString() !== this._id.toString());
-            yield classroom.save();
             user.classroomInvites = user.classroomInvites.filter((invite) => invite.from.toString() !== classroomId.toString());
             this.classroomInvites = user.classroomInvites;
+            user.organizations = user.organizations.map((organization) => {
+                if (organization.id.toString() === classroom.organization.toString()) {
+                    organization.classrooms.push(classroom._id);
+                }
+                return organization;
+            });
+            yield classroom.save();
             yield user.save();
         });
     }

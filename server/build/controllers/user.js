@@ -12,7 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.submitTestResponse = exports.answerTestQuestion = exports.startGivingTest = exports.acceptClassroomInvite = exports.acceptOrganizationInvite = exports.signinWithEmailAndPassword = exports.signupWithEmailAndPassword = void 0;
+exports.evaluateTestResponses = exports.submitTestResponse = exports.answerTestQuestion = exports.startGivingTest = exports.acceptClassroomInvite = exports.acceptOrganizationInvite = exports.signinWithEmailAndPassword = exports.signupWithEmailAndPassword = void 0;
 const user_1 = __importDefault(require("../services/user"));
 const test_1 = __importDefault(require("../services/test"));
 const testStatus_1 = require("../utils/enums/testStatus");
@@ -175,4 +175,22 @@ function submitTestResponse(req, res) {
     });
 }
 exports.submitTestResponse = submitTestResponse;
+function evaluateTestResponses(req, res) {
+    return __awaiter(this, void 0, void 0, function* () {
+        try {
+            const { testId } = req.params;
+            const test = yield test_1.default.getTestById(testId);
+            const testService = new test_1.default(test);
+            yield testService.evaluateTestResponses();
+            return res
+                .status(201)
+                .json({ messsage: "Successfully evaluated test responses" });
+        }
+        catch (error) {
+            console.log(error);
+            return res.status(400).json({ message: error.message });
+        }
+    });
+}
+exports.evaluateTestResponses = evaluateTestResponses;
 //# sourceMappingURL=user.js.map

@@ -190,3 +190,20 @@ export async function submitTestResponse(req: Request, res: Response) {
     return res.status(400).json({ message: error.message });
   }
 }
+
+export async function evaluateTestResponses(req: Request, res: Response) {
+  try {
+    const { testId } = req.params;
+    const test = await TestService.getTestById(
+      testId as unknown as Types.ObjectId
+    );
+    const testService = new TestService(test);
+    await testService.evaluateTestResponses();
+    return res
+      .status(201)
+      .json({ messsage: "Successfully evaluated test responses" });
+  } catch (error: any) {
+    console.log(error);
+    return res.status(400).json({ message: error.message });
+  }
+}

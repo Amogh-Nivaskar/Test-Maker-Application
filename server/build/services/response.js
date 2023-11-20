@@ -75,6 +75,32 @@ class ResponseService {
             return false;
         });
     }
+    evaluateResponse() {
+        return __awaiter(this, void 0, void 0, function* () {
+            const response = yield response_1.ResponseModel.findById(this._id).populate("answers");
+            if (!response)
+                throw new Error("Response Not Found");
+            const evaluatedAnswersPromises = response === null || response === void 0 ? void 0 : response.answers.map((answer) => {
+                const answerService = new answer_1.AnswerService(answer);
+                const marks = answerService.getEvaluationAnswerResult();
+                return marks;
+            });
+            if (evaluatedAnswersPromises) {
+                const evaluatedAnswers = yield Promise.all(evaluatedAnswersPromises);
+                const totalMarks = evaluatedAnswers.reduce((sum, currMarks) => {
+                    if (currMarks)
+                        return sum + currMarks;
+                    return sum;
+                }, 0);
+                response.marksScored = totalMarks;
+                response.status = responseStatus_1.ResponseStatus.Evaluated;
+                yield response.save();
+            }
+            else {
+                throw new Error(`Error in Evaluating Answers for Response ID: ${this._id}`);
+            }
+        });
+    }
 }
 exports.ResponseService = ResponseService;
 //# sourceMappingURL=response.js.map

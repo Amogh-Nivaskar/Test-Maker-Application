@@ -14,4 +14,5 @@ export interface ITest {
   status: TestStatus;
   questions: Array<IQuestion> | Array<IQuestion["_id"]>;
   responses: Array<IResponse> | Array<IResponse["_id"]>;
+  totalMarks: number;
 }

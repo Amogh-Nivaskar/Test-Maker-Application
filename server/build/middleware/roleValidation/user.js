@@ -12,7 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.validateUserGivingTestAuthorization = void 0;
+exports.validateEvaluateTestAuthorization = exports.validateUserGivingTestAuthorization = void 0;
 const test_1 = __importDefault(require("../../services/test"));
 function validateUserGivingTestAuthorization(req, res, next) {
     return __awaiter(this, void 0, void 0, function* () {
@@ -37,4 +37,26 @@ function validateUserGivingTestAuthorization(req, res, next) {
     });
 }
 exports.validateUserGivingTestAuthorization = validateUserGivingTestAuthorization;
+function validateEvaluateTestAuthorization(req, res, next) {
+    return __awaiter(this, void 0, void 0, function* () {
+        try {
+            const user = req.user;
+            const { testId } = req.params;
+            const test = yield test_1.default.getTestById(testId);
+            if (test.createdBy.toString() === user._id.toString()) {
+                next();
+            }
+            else {
+                return res.status(401).json({
+                    message: "Test evaluation can be initiated only by the teacher who made the test",
+                });
+            }
+        }
+        catch (error) {
+            console.log(error);
+            return res.status(400).json({ message: error.message });
+        }
+    });
+}
+exports.validateEvaluateTestAuthorization = validateEvaluateTestAuthorization;
 //# sourceMappingURL=user.js.map

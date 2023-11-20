@@ -30,6 +30,8 @@ const question_1 = __importDefault(require("./question"));
 const question_2 = require("../models/question");
 const classroom_2 = require("../models/classroom");
 const roles_1 = require("../utils/enums/roles");
+const response_1 = require("./response");
+const responseStatus_1 = require("../utils/enums/responseStatus");
 class TestService {
     constructor(test) {
         this._id = test._id;
@@ -40,6 +42,7 @@ class TestService {
         this.status = test.status;
         this.questions = test.questions;
         this.responses = test.responses;
+        this.totalMarks = test.totalMarks;
     }
     createTest(outputs) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -106,6 +109,25 @@ class TestService {
                 throw new Error("Test Not Found");
             test.responses.push(responseId);
             yield test.save();
+        });
+    }
+    evaluateTestResponses() {
+        return __awaiter(this, void 0, void 0, function* () {
+            const test = yield test_1.TestModel.findById(this._id).populate("responses");
+            if (!test)
+                throw new Error("Test Not Found");
+            const evaluatedResponsesPromises = test.responses.map((response) => {
+                if (response.status === responseStatus_1.ResponseStatus.Submitted) {
+                    const responseService = new response_1.ResponseService(response);
+                    responseService.evaluateResponse();
+                }
+            });
+            if (evaluatedResponsesPromises) {
+                yield Promise.all(evaluatedResponsesPromises);
+            }
+            else {
+                throw new Error("Error in Evaluating Responses");
+            }
         });
     }
 }

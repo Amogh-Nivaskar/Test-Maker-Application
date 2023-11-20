@@ -16,5 +16,6 @@ router.post("/acceptClassroomInvite", authentication_1.validateUserAuthenticatio
 router.post("/test/:testId/startTest", authentication_1.validateUserAuthentication, user_2.validateUserGivingTestAuthorization, user_1.startGivingTest);
 router.post("/test/:testId/response/:responseId/answer/:answerId", authentication_1.validateUserAuthentication, user_2.validateUserGivingTestAuthorization, user_1.answerTestQuestion);
 router.post("/test/:testId/response/:responseId/submit", authentication_1.validateUserAuthentication, user_2.validateUserGivingTestAuthorization, user_1.submitTestResponse);
+router.post("/test/:testId/evaluate", authentication_1.validateUserAuthentication, user_2.validateEvaluateTestAuthorization, user_1.evaluateTestResponses);
 exports.default = router;
 //# sourceMappingURL=user.js.map

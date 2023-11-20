@@ -79,4 +79,34 @@ export class ResponseService implements IResponse {
     if (response) return true;
     return false;
   }
+
+  public async evaluateResponse() {
+    const response = await ResponseModel.findById(this._id).populate("answers");
+
+    if (!response) throw new Error("Response Not Found");
+
+    const evaluatedAnswersPromises = response?.answers.map((answer: any) => {
+      const answerService = new AnswerService(answer);
+      const marks = answerService.getEvaluationAnswerResult();
+      return marks;
+    });
+
+    if (evaluatedAnswersPromises) {
+      const evaluatedAnswers = await Promise.all(evaluatedAnswersPromises);
+      const totalMarks = evaluatedAnswers.reduce(
+        (sum: number, currMarks: number) => {
+          if (currMarks) return sum + currMarks;
+          return sum;
+        },
+        0
+      );
+      response.marksScored = totalMarks;
+      response.status = ResponseStatus.Evaluated;
+      await response.save();
+    } else {
+      throw new Error(
+        `Error in Evaluating Answers for Response ID: ${this._id}`
+      );
+    }
+  }
 }

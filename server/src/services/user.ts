@@ -183,13 +183,20 @@ class UserService implements IUser {
       (invite: IInvite) => invite.user.toString() !== this._id.toString()
     );
 
-    await classroom.save();
-
     user.classroomInvites = user.classroomInvites.filter(
       (invite: IRecievedInvite) =>
         invite.from.toString() !== classroomId.toString()
     );
     this.classroomInvites = user.classroomInvites;
+
+    user.organizations = user.organizations.map((organization: any) => {
+      if (organization.id.toString() === classroom.organization.toString()) {
+        organization.classrooms.push(classroom._id);
+      }
+      return organization;
+    });
+
+    await classroom.save();
     await user.save();
   }
 }

@@ -3,13 +3,17 @@ import {
   acceptClassroomInvite,
   acceptOrganizationInvite,
   answerTestQuestion,
+  evaluateTestResponses,
   signinWithEmailAndPassword,
   signupWithEmailAndPassword,
   startGivingTest,
   submitTestResponse,
 } from "../controllers/user";
 import { validateUserAuthentication } from "../middleware/authentication";
-import { validateUserGivingTestAuthorization } from "../middleware/roleValidation/user";
+import {
+  validateEvaluateTestAuthorization,
+  validateUserGivingTestAuthorization,
+} from "../middleware/roleValidation/user";
 
 const router = express.Router();
 
@@ -47,6 +51,13 @@ router.post(
   validateUserAuthentication,
   validateUserGivingTestAuthorization,
   submitTestResponse
+);
+
+router.post(
+  "/test/:testId/evaluate",
+  validateUserAuthentication,
+  validateEvaluateTestAuthorization,
+  evaluateTestResponses
 );
 
 export default router;
