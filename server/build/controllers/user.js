@@ -12,7 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.evaluateTestResponses = exports.submitTestResponse = exports.answerTestQuestion = exports.startGivingTest = exports.acceptClassroomInvite = exports.acceptOrganizationInvite = exports.signinWithEmailAndPassword = exports.signupWithEmailAndPassword = void 0;
+exports.evaluateTestResponses = exports.submitTestResponse = exports.answerTestQuestion = exports.startGivingTest = exports.acceptClassroomInvite = exports.acceptOrganizationInvite = exports.checkAuthStatus = exports.signinWithEmailAndPassword = exports.signupWithEmailAndPassword = void 0;
 const user_1 = __importDefault(require("../services/user"));
 const test_1 = __importDefault(require("../services/test"));
 const testStatus_1 = require("../utils/enums/testStatus");
@@ -23,14 +23,14 @@ function signupWithEmailAndPassword(req, res) {
     return __awaiter(this, void 0, void 0, function* () {
         try {
             const { name, email, password } = req.body;
-            const accessToken = yield user_1.default.signupWithEmailAndPassword(name, email, password);
+            const payload = yield user_1.default.signupWithEmailAndPassword(name, email, password);
             return res
                 .status(201)
-                .json({ message: "User Signed Up Successfully", accessToken, email });
+                .json({ message: "User Signed Up Successfully", payload });
         }
         catch (error) {
-            console.log(error);
-            return res.status(400).json({ message: "Something went wrong in Sign Up" });
+            console.log("Error in sign up: ", error.message);
+            return res.status(400).json({ message: error.message });
         }
     });
 }
@@ -39,10 +39,10 @@ function signinWithEmailAndPassword(req, res) {
     return __awaiter(this, void 0, void 0, function* () {
         try {
             const { email, password } = req.body;
-            const accessToken = yield user_1.default.signinWithEmailAndPassword(email, password);
+            const payload = yield user_1.default.signinWithEmailAndPassword(email, password);
             return res
-                .status(201)
-                .json({ message: "User Signed In Successfully", accessToken, email });
+                .status(200)
+                .json({ message: "User Signed In Successfully", payload });
         }
         catch (error) {
             console.log(error);
@@ -51,6 +51,28 @@ function signinWithEmailAndPassword(req, res) {
     });
 }
 exports.signinWithEmailAndPassword = signinWithEmailAndPassword;
+function checkAuthStatus(req, res) {
+    return __awaiter(this, void 0, void 0, function* () {
+        try {
+            const user = req.user;
+            if (user) {
+                return res
+                    .status(200)
+                    .json({ message: "User is currently logged in", data: user });
+            }
+            else {
+                return res.status(401).json({ message: "User is not logged in" });
+            }
+        }
+        catch (error) {
+            console.log(error);
+            return res
+                .status(400)
+                .json({ message: "Something went wrong when checking auth status" });
+        }
+    });
+}
+exports.checkAuthStatus = checkAuthStatus;
 function acceptOrganizationInvite(req, res) {
     return __awaiter(this, void 0, void 0, function* () {
         try {

@@ -51,8 +51,8 @@ class UserService {
                 throw new Error(`User by this email already exists`);
             const user = new user_1.UserModel({ name, email, password });
             yield user.save();
-            const accessToken = this.generateAccessToken(email);
-            return accessToken;
+            const accessToken = yield this.generateAccessToken(email);
+            return { accessToken, id: user._id, name, email };
         });
     }
     static signinWithEmailAndPassword(email, password) {
@@ -63,8 +63,13 @@ class UserService {
             if (existingUser.password !== password) {
                 throw new Error("Incorrect email or password");
             }
-            const accessToken = this.generateAccessToken(email);
-            return accessToken;
+            const accessToken = yield this.generateAccessToken(email);
+            return {
+                accessToken,
+                id: existingUser._id,
+                email,
+                name: existingUser.name,
+            };
         });
     }
     static generateAccessToken(email) {

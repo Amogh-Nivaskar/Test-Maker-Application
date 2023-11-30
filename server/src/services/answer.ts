@@ -55,14 +55,14 @@ export class AnswerService implements IAnswer {
         let output;
 
         try {
-          output = await Postgres.query(answer.answer.query);
+          output = await Postgres`${answer.answer.query}`;
         } catch (error) {
           output = null;
         }
 
         if (output) {
           // console.log(output.rows);
-          answer.answer.output = output.rows;
+          answer.answer.output = output;
 
           answer.isCorrect = this.isAnswerCorrect(
             answer.question.modelAns.output,

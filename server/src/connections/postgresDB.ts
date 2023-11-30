@@ -1,17 +1,7 @@
-import pg from "pg";
+import postgres from "postgres";
 
-const { Pool } = pg;
+const sql = postgres(process.env.POSTGRES_DB_URL + "?sslmode=require", {});
+console.log("Connected to PostgresDB successfully");
 
-const postgresdb_url =
-  "postgres://default:o4PicgER2KAG@ep-red-snow-40545631-pooler.ap-southeast-1.postgres.vercel-storage.com:5432/verceldb";
-
-const pool = new Pool({
-  connectionString: postgresdb_url + "?sslmode=require",
-});
-
-pool.connect((err) => {
-  if (err) throw err;
-  console.log("PostgresDB connection successful");
-});
-
-export default pool;
+// will use psql environment variables
+export default sql;

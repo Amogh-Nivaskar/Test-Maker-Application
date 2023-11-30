@@ -151,8 +151,12 @@ class OrganizationService {
     }
     static addTable(createTableQuery, populateTableQuery) {
         return __awaiter(this, void 0, void 0, function* () {
-            yield postgresDB_1.default.query(createTableQuery);
-            yield postgresDB_1.default.query(populateTableQuery);
+            console.log(createTableQuery);
+            const data = yield (0, postgresDB_1.default) `Select * from friendmany`;
+            console.log(data);
+            yield (0, postgresDB_1.default) `${createTableQuery}`;
+            console.log(populateTableQuery);
+            yield (0, postgresDB_1.default) `${populateTableQuery}`;
         });
     }
 }

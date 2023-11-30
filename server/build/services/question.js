@@ -27,9 +27,9 @@ class QuestionService {
         return __awaiter(this, void 0, void 0, function* () {
             try {
                 if (modelAns.query) {
-                    const output = yield postgresDB_1.default.query(modelAns.query);
-                    console.log(output.rows);
-                    return output.rows;
+                    const output = yield (0, postgresDB_1.default) `${modelAns.query}`;
+                    console.log(output);
+                    return output;
                 }
                 else {
                     throw new Error("Model Answer Query not found");

@@ -25,9 +25,9 @@ class QuestionService implements IQuestion {
   public static async checkProgrammingModelAnswer(modelAns: any, idx: number) {
     try {
       if (modelAns.query) {
-        const output = await Postgres.query(modelAns.query);
-        console.log(output.rows);
-        return output.rows;
+        const output = await Postgres`${modelAns.query}`;
+        console.log(output);
+        return output;
       } else {
         throw new Error("Model Answer Query not found");
       }

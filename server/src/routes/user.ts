@@ -3,6 +3,7 @@ import {
   acceptClassroomInvite,
   acceptOrganizationInvite,
   answerTestQuestion,
+  checkAuthStatus,
   evaluateTestResponses,
   signinWithEmailAndPassword,
   signupWithEmailAndPassword,
@@ -19,6 +20,7 @@ const router = express.Router();
 
 router.post("/signup", signupWithEmailAndPassword);
 router.post("/signin", signinWithEmailAndPassword);
+router.get("/checkAuthStatus", validateUserAuthentication, checkAuthStatus);
 router.post(
   "/acceptOrganizationInvite",
   validateUserAuthentication,

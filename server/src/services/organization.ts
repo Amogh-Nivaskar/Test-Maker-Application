@@ -162,8 +162,12 @@ class OrganizationService implements IOrganization {
     createTableQuery: string,
     populateTableQuery: string
   ) {
-    await Postgres.query(createTableQuery);
-    await Postgres.query(populateTableQuery);
+    console.log(createTableQuery);
+    const data = await Postgres`Select * from friendmany`;
+    console.log(data);
+    await Postgres`${createTableQuery}`;
+    console.log(populateTableQuery);
+    await Postgres`${populateTableQuery}`;
   }
 
   // TODO -  delete org

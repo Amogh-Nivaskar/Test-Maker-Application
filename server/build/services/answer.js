@@ -61,14 +61,14 @@ class AnswerService {
                 case questionsTypes_1.QuestionTypes.SQL:
                     let output;
                     try {
-                        output = yield postgresDB_1.default.query(answer.answer.query);
+                        output = yield (0, postgresDB_1.default) `${answer.answer.query}`;
                     }
                     catch (error) {
                         output = null;
                     }
                     if (output) {
                         // console.log(output.rows);
-                        answer.answer.output = output.rows;
+                        answer.answer.output = output;
                         answer.isCorrect = this.isAnswerCorrect(answer.question.modelAns.output, answer.answer.output);
                         // console.log(answer.answer.output);
                     }

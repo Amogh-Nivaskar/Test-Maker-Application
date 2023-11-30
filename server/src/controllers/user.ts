@@ -11,33 +11,51 @@ import { ResponseStatus } from "../utils/enums/responseStatus";
 export async function signupWithEmailAndPassword(req: Request, res: Response) {
   try {
     const { name, email, password } = req.body;
-    const accessToken = await UserService.signupWithEmailAndPassword(
+    const payload = await UserService.signupWithEmailAndPassword(
       name,
       email,
       password
     );
     return res
       .status(201)
-      .json({ message: "User Signed Up Successfully", accessToken, email });
+      .json({ message: "User Signed Up Successfully", payload });
   } catch (error: any) {
-    console.log(error);
-    return res.status(400).json({ message: "Something went wrong in Sign Up" });
+    console.log("Error in sign up: ", error.message);
+    return res.status(400).json({ message: error.message });
   }
 }
 
 export async function signinWithEmailAndPassword(req: Request, res: Response) {
   try {
     const { email, password } = req.body;
-    const accessToken = await UserService.signinWithEmailAndPassword(
+    const payload = await UserService.signinWithEmailAndPassword(
       email,
       password
     );
     return res
-      .status(201)
-      .json({ message: "User Signed In Successfully", accessToken, email });
+      .status(200)
+      .json({ message: "User Signed In Successfully", payload });
   } catch (error: any) {
     console.log(error);
     return res.status(400).json({ message: "Something went wrong in Sign In" });
+  }
+}
+
+export async function checkAuthStatus(req: Request, res: Response) {
+  try {
+    const user = req.user;
+    if (user) {
+      return res
+        .status(200)
+        .json({ message: "User is currently logged in", data: user });
+    } else {
+      return res.status(401).json({ message: "User is not logged in" });
+    }
+  } catch (error: any) {
+    console.log(error);
+    return res
+      .status(400)
+      .json({ message: "Something went wrong when checking auth status" });
   }
 }
 

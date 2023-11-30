@@ -10,6 +10,7 @@ const user_2 = require("../middleware/roleValidation/user");
 const router = express_1.default.Router();
 router.post("/signup", user_1.signupWithEmailAndPassword);
 router.post("/signin", user_1.signinWithEmailAndPassword);
+router.get("/checkAuthStatus", authentication_1.validateUserAuthentication, user_1.checkAuthStatus);
 router.post("/acceptOrganizationInvite", authentication_1.validateUserAuthentication, user_1.acceptOrganizationInvite);
 router.post("/acceptClassroomInvite", authentication_1.validateUserAuthentication, user_1.acceptClassroomInvite);
 // Answering Test

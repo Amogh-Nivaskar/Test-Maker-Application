@@ -52,7 +52,7 @@ class UserService implements IUser {
     name: string,
     email: string,
     password: string
-  ): Promise<string> {
+  ) {
     const existingUser = await this.getUserByEmail(email);
     if (existingUser) throw new Error(`User by this email already exists`);
 
@@ -60,15 +60,15 @@ class UserService implements IUser {
 
     await user.save();
 
-    const accessToken = this.generateAccessToken(email);
+    const accessToken = await this.generateAccessToken(email);
 
-    return accessToken;
+    return { accessToken, id: user._id, name, email };
   }
 
   public static async signinWithEmailAndPassword(
     email: string,
     password: string
-  ): Promise<string> {
+  ) {
     const existingUser = await this.getUserByEmail(email);
     if (!existingUser) throw new Error("No user with given email ID");
 
@@ -76,9 +76,14 @@ class UserService implements IUser {
       throw new Error("Incorrect email or password");
     }
 
-    const accessToken = this.generateAccessToken(email);
+    const accessToken = await this.generateAccessToken(email);
 
-    return accessToken;
+    return {
+      accessToken,
+      id: existingUser._id,
+      email,
+      name: existingUser.name,
+    };
   }
 
   private static async generateAccessToken(email: string): Promise<string> {
