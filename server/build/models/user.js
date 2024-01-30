@@ -26,10 +26,16 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.UserModel = void 0;
 const mongoose_1 = __importStar(require("mongoose"));
 const roles_1 = require("../utils/enums/roles");
+const providerTypes_1 = require("../utils/enums/providerTypes");
 const UserSchema = new mongoose_1.Schema({
     name: {
         type: String,
         required: true,
+    },
+    provider: {
+        type: String,
+        required: true,
+        default: providerTypes_1.ProviderTypes.Credentials,
     },
     email: {
         type: String,
@@ -38,7 +44,6 @@ const UserSchema = new mongoose_1.Schema({
     },
     password: {
         type: String,
-        required: true,
     },
     ownedOrganizations: [
         {
@@ -46,18 +51,24 @@ const UserSchema = new mongoose_1.Schema({
             ref: "Organization",
         },
     ],
+    // organizations: [
+    //   {
+    //     id: {
+    //       type: Schema.Types.ObjectId,
+    //       ref: "Organization",
+    //     },
+    //     classrooms: [
+    //       {
+    //         type: Schema.Types.ObjectId,
+    //         ref: "Classroom",
+    //       },
+    //     ],
+    //   },
+    // ],
     organizations: [
         {
-            id: {
-                type: mongoose_1.Schema.Types.ObjectId,
-                ref: "Organization",
-            },
-            classrooms: [
-                {
-                    type: mongoose_1.Schema.Types.ObjectId,
-                    ref: "Classroom",
-                },
-            ],
+            type: mongoose_1.Schema.Types.ObjectId,
+            ref: "Organization",
         },
     ],
     organizationInvites: [

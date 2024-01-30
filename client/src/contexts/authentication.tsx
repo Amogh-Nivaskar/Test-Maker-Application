@@ -1,19 +1,14 @@
 "use client";
 
-import axiosReq from "@/utils/axios";
+import { UserRole } from "@/redux/slices/activeOrganization";
+import AxiosClient from "@/utils/axios";
+import { error } from "console";
 import { createContext, useContext, useReducer } from "react";
-
-export enum UserRole {
-  Teacher = "teacher",
-  Student = "student",
-  Admin = "admin",
-  NonMember = "NonMember",
-}
 
 export const ACCESS_TOKEN = "__Access_Token__";
 
 type stateType = {
-  id: null | string;
+  _id: null | string;
   name: null | string;
   email: null | string;
   activeOrganization?: null | string;
@@ -21,7 +16,7 @@ type stateType = {
 };
 
 const initialState: stateType = {
-  id: null,
+  _id: null,
   name: null,
   email: null,
   activeOrganization: null,
@@ -61,7 +56,7 @@ function reducer(state: stateType, action: ACTIONTYPE) {
 }
 
 type PayloadType = {
-  id: string;
+  _id: string;
   name: string;
   email: string;
   accessToken: string;
@@ -82,14 +77,16 @@ export function AuthenticationProvider({
 
   async function signUp(name: string, email: string, password: string) {
     try {
-      const res = await axiosReq
-        .post("user/signup", { name, email, password })
-        .catch((error: any) => error.response);
+      const res = await AxiosClient.post("user/signup", {
+        name,
+        email,
+        password,
+      }).catch((error: any) => error.response);
 
       if (res.status === 201) {
-        const { id, name, email, accessToken }: PayloadType = res.data.payload;
+        const { _id, name, email, accessToken }: PayloadType = res.data.payload;
 
-        dispatch({ type: "signUp", payload: { id, name, email } });
+        dispatch({ type: "signUp", payload: { _id, name, email } });
         localStorage.setItem(ACCESS_TOKEN, accessToken);
         return { signedIn: true, message: res.data.message };
       } else {
@@ -103,13 +100,14 @@ export function AuthenticationProvider({
 
   async function signIn(email: string, password: string) {
     try {
-      const res = await axiosReq
-        .post("user/signin", { email, password })
-        .catch((error) => error.response);
+      const res = await AxiosClient.post("user/signin", {
+        email,
+        password,
+      }).catch((error) => error.response);
 
       if (res.status === 200) {
-        const { id, name, email, accessToken }: PayloadType = res.data.payload;
-        dispatch({ type: "signIn", payload: { id, name, email } });
+        const { _id, name, email, accessToken }: PayloadType = res.data.payload;
+        dispatch({ type: "signIn", payload: { _id, name, email } });
         localStorage.setItem(ACCESS_TOKEN, accessToken);
         return { signedIn: true, message: res.data.message };
       } else {
@@ -123,22 +121,29 @@ export function AuthenticationProvider({
   async function checkAuthStatus() {
     try {
       const accessToken = localStorage.getItem(ACCESS_TOKEN);
-      const res = await axiosReq.get("user/checkAuthStatus", {
+      const res = await AxiosClient.get("user/checkAuthStatus", {
         headers: {
           Authorization: accessToken,
         },
-      });
+      }).catch((error) => error.response);
 
       if (res.status !== 200) {
         dispatch({ type: "signOut" });
         localStorage.removeItem(ACCESS_TOKEN);
+        return { isAuthenticated: false, message: res.data.message };
+      } else {
+        // dispatch({type: ""})
+        const { user } = res.data;
+        console.log(res.data);
+        dispatch({ type: "signIn", payload: user });
+        return { isAuthenticated: true, message: res.data.message };
       }
     } catch (error: any) {
       console.log(error);
     }
   }
 
-  async function signOut() {
+  function signOut() {
     try {
       dispatch({ type: "signOut" });
       localStorage.removeItem(ACCESS_TOKEN);

@@ -41,6 +41,25 @@ export async function sendClassroomInvite(req: Request, res: Response) {
   }
 }
 
+export async function getTests(req: Request, res: Response) {
+  try {
+    const { classroomId } = req.params;
+    const classroom = await ClassroomService.getClassroomById(
+      classroomId as unknown as Types.ObjectId
+    );
+    const classroomService = new ClassroomService(classroom);
+    const tests = await classroomService.getTests();
+    return res
+      .status(201)
+      .json({ message: "Fetched tests Successfully", tests });
+  } catch (error: any) {
+    console.log(error);
+    return res
+      .status(400)
+      .json({ message: error.message, errorQuestionIdx: error.questionIdx });
+  }
+}
+
 export async function createTest(req: Request, res: Response) {
   try {
     const user = req.user;

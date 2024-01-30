@@ -20,10 +20,15 @@ function validateUserAuthentication(req, res, next) {
             const token = req.header("Authorization");
             if (!token)
                 throw new Error("No Token found in request header");
-            const user = user_1.default.verifyToken(token);
-            if (!user)
+            // const user = UserService.verifyToken(token);
+            const userObj = yield user_1.default.getUserByEmail(token);
+            if (!userObj)
                 throw new Error("Token is faulty");
-            req.user = user;
+            req.user = {
+                _id: userObj._id,
+                name: userObj.name,
+                email: userObj.email,
+            };
             next();
         }
         catch (error) {

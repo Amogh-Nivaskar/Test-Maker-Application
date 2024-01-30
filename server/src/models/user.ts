@@ -1,11 +1,17 @@
 import mongoose, { Model, Schema } from "mongoose";
 import { IUser } from "../interfaces/user";
 import { UserRole } from "../utils/enums/roles";
+import { ProviderTypes } from "../utils/enums/providerTypes";
 
 const UserSchema: Schema = new Schema<IUser>({
   name: {
     type: String,
     required: true,
+  },
+  provider: {
+    type: String,
+    required: true,
+    default: ProviderTypes.Credentials,
   },
   email: {
     type: String,
@@ -14,7 +20,6 @@ const UserSchema: Schema = new Schema<IUser>({
   },
   password: {
     type: String,
-    required: true,
   },
   ownedOrganizations: [
     {
@@ -22,18 +27,24 @@ const UserSchema: Schema = new Schema<IUser>({
       ref: "Organization",
     },
   ],
+  // organizations: [
+  //   {
+  //     id: {
+  //       type: Schema.Types.ObjectId,
+  //       ref: "Organization",
+  //     },
+  //     classrooms: [
+  //       {
+  //         type: Schema.Types.ObjectId,
+  //         ref: "Classroom",
+  //       },
+  //     ],
+  //   },
+  // ],
   organizations: [
     {
-      id: {
-        type: Schema.Types.ObjectId,
-        ref: "Organization",
-      },
-      classrooms: [
-        {
-          type: Schema.Types.ObjectId,
-          ref: "Classroom",
-        },
-      ],
+      type: Schema.Types.ObjectId,
+      ref: "Organization",
     },
   ],
   organizationInvites: [

@@ -12,8 +12,45 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.createTable = exports.sendOrganizationInvite = exports.createOrganization = void 0;
+exports.createTable = exports.sendOrganizationInvite = exports.createOrganization = exports.getOrganizationRole = exports.getClassrooms = void 0;
 const organization_1 = __importDefault(require("../services/organization"));
+function getClassrooms(req, res) {
+    return __awaiter(this, void 0, void 0, function* () {
+        try {
+            const { organizationId } = req.params;
+            const organization = yield organization_1.default.getOrganizationById(organizationId);
+            const organizationService = new organization_1.default(organization);
+            const classrooms = yield organizationService.getClassrooms();
+            return res
+                .status(201)
+                .json({ message: "Fetched classrooms successfully", classrooms });
+        }
+        catch (error) {
+            console.log(error);
+            return res.status(400).json({ message: error.message });
+        }
+    });
+}
+exports.getClassrooms = getClassrooms;
+function getOrganizationRole(req, res) {
+    return __awaiter(this, void 0, void 0, function* () {
+        try {
+            const user = req.user;
+            const { organizationId } = req.params;
+            const organization = yield organization_1.default.getOrganizationById(organizationId);
+            const organizationService = new organization_1.default(organization);
+            const role = yield organizationService.getOrganizationRole(user._id);
+            return res
+                .status(201)
+                .json({ message: "Fetched organization role successfully", role });
+        }
+        catch (error) {
+            console.log(error);
+            return res.status(400).json({ message: error.message });
+        }
+    });
+}
+exports.getOrganizationRole = getOrganizationRole;
 function createOrganization(req, res) {
     return __awaiter(this, void 0, void 0, function* () {
         try {

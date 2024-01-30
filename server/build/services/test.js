@@ -91,6 +91,25 @@ class TestService {
             return outputs;
         });
     }
+    getQuestions() {
+        return __awaiter(this, void 0, void 0, function* () {
+            const test = yield test_1.TestModel.findById(this._id).populate("questions");
+            if (!test)
+                throw new Error("Test Not Found");
+            return test.questions;
+        });
+    }
+    getResponses() {
+        return __awaiter(this, void 0, void 0, function* () {
+            const test = yield test_1.TestModel.findById(this._id).populate({
+                path: "responses",
+                populate: [{ path: "answers" }, { path: "givenBy" }],
+            });
+            if (!test)
+                throw new Error("Test Not Found");
+            return test.responses;
+        });
+    }
     checkIfStudentCanGiveTest(userId) {
         return __awaiter(this, void 0, void 0, function* () {
             const classroomId = this.classroom;

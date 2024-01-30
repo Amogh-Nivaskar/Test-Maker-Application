@@ -168,6 +168,14 @@ class ClassroomService {
             }
         });
     }
+    getTests() {
+        return __awaiter(this, void 0, void 0, function* () {
+            const classroom = yield classroom_1.ClassroomModel.findById(this._id).populate("tests");
+            if (!classroom)
+                throw new Error(`Classroom by ${this._id} ID does not exist`);
+            return classroom.tests;
+        });
+    }
 }
 exports.default = ClassroomService;
 //# sourceMappingURL=classroom.js.map

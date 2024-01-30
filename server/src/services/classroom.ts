@@ -219,6 +219,13 @@ class ClassroomService implements IClassroom {
     }
   }
 
+  public async getTests() {
+    const classroom = await ClassroomModel.findById(this._id).populate("tests");
+    if (!classroom)
+      throw new Error(`Classroom by ${this._id} ID does not exist`);
+    return classroom.tests;
+  }
+
   // TODO: Delete Classroom
 }
 

@@ -12,7 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.validateCreateTestAuthorization = exports.validateSendingClassroomInviteAuthorization = exports.validateCreatingClassroomAuthorization = void 0;
+exports.validateUserAsClassroomMember = exports.validateCreateTestAuthorization = exports.validateSendingClassroomInviteAuthorization = exports.validateCreatingClassroomAuthorization = void 0;
 const organization_1 = __importDefault(require("../../services/organization"));
 const roles_1 = require("../../utils/enums/roles");
 const classroom_1 = __importDefault(require("../../services/classroom"));
@@ -89,4 +89,26 @@ function validateCreateTestAuthorization(req, res, next) {
     });
 }
 exports.validateCreateTestAuthorization = validateCreateTestAuthorization;
+function validateUserAsClassroomMember(req, res, next) {
+    return __awaiter(this, void 0, void 0, function* () {
+        try {
+            const user = req.user;
+            const { classroomId } = req.params;
+            const classroom = yield classroom_1.default.getClassroomById(classroomId);
+            if ((classroom === null || classroom === void 0 ? void 0 : classroom.teachers.includes(user._id)) ||
+                (classroom === null || classroom === void 0 ? void 0 : classroom.students.includes(user._id))) {
+                next();
+            }
+            else {
+                return res.status(401).json({
+                    message: "Access Denied. User needs to be classroom's member",
+                });
+            }
+        }
+        catch (error) {
+            return res.status(400).json({ message: error.message });
+        }
+    });
+}
+exports.validateUserAsClassroomMember = validateUserAsClassroomMember;
 //# sourceMappingURL=classroom.js.map

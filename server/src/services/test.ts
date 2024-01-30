@@ -99,6 +99,21 @@ class TestService implements ITest {
     return outputs;
   }
 
+  public async getQuestions() {
+    const test = await TestModel.findById(this._id).populate("questions");
+    if (!test) throw new Error("Test Not Found");
+    return test.questions;
+  }
+
+  public async getResponses() {
+    const test = await TestModel.findById(this._id).populate({
+      path: "responses",
+      populate: [{ path: "answers" }, { path: "givenBy" }],
+    });
+    if (!test) throw new Error("Test Not Found");
+    return test.responses;
+  }
+
   public async checkIfStudentCanGiveTest(userId: Types.ObjectId) {
     const classroomId = this.classroom;
     const classroom = await ClassroomModel.findById(classroomId);

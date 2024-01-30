@@ -113,3 +113,29 @@ export async function validateCreateTestAuthorization(
     return res.status(400).json({ message: error.message });
   }
 }
+
+export async function validateUserAsClassroomMember(
+  req: Request,
+  res: Response,
+  next: NextFunction
+) {
+  try {
+    const user = req.user;
+    const { classroomId } = req.params;
+    const classroom = await ClassroomService.getClassroomById(
+      classroomId as unknown as Types.ObjectId
+    );
+    if (
+      classroom?.teachers.includes(user._id) ||
+      classroom?.students.includes(user._id)
+    ) {
+      next();
+    } else {
+      return res.status(401).json({
+        message: "Access Denied. User needs to be classroom's member",
+      });
+    }
+  } catch (error: any) {
+    return res.status(400).json({ message: error.message });
+  }
+}

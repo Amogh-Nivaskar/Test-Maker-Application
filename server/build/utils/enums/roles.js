@@ -6,6 +6,6 @@ var UserRole;
     UserRole["Teacher"] = "teacher";
     UserRole["Student"] = "student";
     UserRole["Admin"] = "admin";
-    UserRole["NonMember"] = "NonMember";
+    UserRole["NonMember"] = "nonMember";
 })(UserRole || (exports.UserRole = UserRole = {}));
 //# sourceMappingURL=roles.js.map

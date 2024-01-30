@@ -17,10 +17,12 @@ const user_1 = require("../models/user");
 const organization_1 = require("../models/organization");
 const roles_1 = require("../utils/enums/roles");
 const classroom_1 = require("../models/classroom");
+const providerTypes_1 = require("../utils/enums/providerTypes");
 class UserService {
     constructor(user) {
         this._id = user._id;
         this.name = user.name;
+        this.provider = user.provider;
         this.email = user.email;
         this.password = user.password;
         this.ownedOrganizations = user.ownedOrganizations;
@@ -44,15 +46,37 @@ class UserService {
             return user;
         });
     }
-    static signupWithEmailAndPassword(name, email, password) {
+    static signUp(name, email, provider, password) {
+        return __awaiter(this, void 0, void 0, function* () {
+            if (provider === providerTypes_1.ProviderTypes.Google) {
+                const user = new user_1.UserModel({ name, email, provider });
+                yield user.save();
+                const accessToken = this.generateAccessToken(email);
+                return {
+                    user: { _id: user === null || user === void 0 ? void 0 : user._id, name: user === null || user === void 0 ? void 0 : user.name, email: user === null || user === void 0 ? void 0 : user.email },
+                    accessToken,
+                };
+            }
+            else if (provider === providerTypes_1.ProviderTypes.Credentials) {
+                if (!password)
+                    throw new Error("Password not found");
+                const { user, accessToken } = yield this.signupWithEmailAndPassword(name, email, password, provider);
+                return {
+                    user: { _id: user === null || user === void 0 ? void 0 : user._id, name: user === null || user === void 0 ? void 0 : user.name, email: user === null || user === void 0 ? void 0 : user.email },
+                    accessToken,
+                };
+            }
+        });
+    }
+    static signupWithEmailAndPassword(name, email, password, provider) {
         return __awaiter(this, void 0, void 0, function* () {
             const existingUser = yield this.getUserByEmail(email);
             if (existingUser)
                 throw new Error(`User by this email already exists`);
-            const user = new user_1.UserModel({ name, email, password });
+            const user = new user_1.UserModel({ name, email, password, provider });
             yield user.save();
             const accessToken = yield this.generateAccessToken(email);
-            return { accessToken, id: user._id, name, email };
+            return { user, accessToken };
         });
     }
     static signinWithEmailAndPassword(email, password) {
@@ -60,15 +84,19 @@ class UserService {
             const existingUser = yield this.getUserByEmail(email);
             if (!existingUser)
                 throw new Error("No user with given email ID");
-            if (existingUser.password !== password) {
-                throw new Error("Incorrect email or password");
+            if (existingUser.provider === providerTypes_1.ProviderTypes.Credentials &&
+                existingUser.password !== password) {
+                // throw new Error("Incorrect email or password");
+                return null;
             }
             const accessToken = yield this.generateAccessToken(email);
             return {
+                user: {
+                    _id: existingUser === null || existingUser === void 0 ? void 0 : existingUser._id,
+                    name: existingUser === null || existingUser === void 0 ? void 0 : existingUser.name,
+                    email: existingUser === null || existingUser === void 0 ? void 0 : existingUser.email,
+                },
                 accessToken,
-                id: existingUser._id,
-                email,
-                name: existingUser.name,
             };
         });
     }
@@ -97,6 +125,14 @@ class UserService {
         catch (error) {
             return null;
         }
+    }
+    getOrganizations() {
+        return __awaiter(this, void 0, void 0, function* () {
+            const user = yield user_1.UserModel.findById(this._id).populate("organizations");
+            if (!user)
+                throw new Error("User doesnt exist");
+            return user.organizations;
+        });
     }
     acceptOrganizationInvite(organizationId) {
         return __awaiter(this, void 0, void 0, function* () {

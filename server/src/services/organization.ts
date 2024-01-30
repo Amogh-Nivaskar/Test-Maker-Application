@@ -65,6 +65,16 @@ class OrganizationService implements IOrganization {
     return false;
   }
 
+  public async getClassrooms() {
+    const organization = await OrganizationModel.findById(this._id).populate(
+      "classrooms"
+    );
+    if (!organization)
+      throw new Error(`Organization by ${this._id} ID does not exist`);
+
+    return organization.classrooms;
+  }
+
   public async getOrganizationRole(userId: Types.ObjectId): Promise<UserRole> {
     const organization = await OrganizationModel.findById(this._id);
     if (!organization)

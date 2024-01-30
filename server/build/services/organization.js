@@ -66,6 +66,14 @@ class OrganizationService {
             return false;
         });
     }
+    getClassrooms() {
+        return __awaiter(this, void 0, void 0, function* () {
+            const organization = yield organization_1.OrganizationModel.findById(this._id).populate("classrooms");
+            if (!organization)
+                throw new Error(`Organization by ${this._id} ID does not exist`);
+            return organization.classrooms;
+        });
+    }
     getOrganizationRole(userId) {
         return __awaiter(this, void 0, void 0, function* () {
             const organization = yield organization_1.OrganizationModel.findById(this._id);

@@ -11,6 +11,7 @@ export interface IRecievedInvite {
 export interface IUser {
   _id: Types.ObjectId;
   name: string;
+  provider: string;
   email: string;
   password: string;
   ownedOrganizations: Array<IOrganization> | Array<IOrganization["_id"]>;

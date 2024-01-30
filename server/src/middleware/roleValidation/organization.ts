@@ -4,7 +4,7 @@ import { IOrganization } from "../../interfaces/organization";
 import { Types } from "mongoose";
 import { UserRole } from "../../utils/enums/roles";
 
-export async function validateSendingOrganizationInviteAuthorization(
+export async function validateUserAsAdmin(
   req: Request,
   res: Response,
   next: NextFunction
@@ -28,6 +28,37 @@ export async function validateSendingOrganizationInviteAuthorization(
       return res.status(401).json({
         message:
           "Access Denied. User needs to be organization's admin to send organization invite",
+      });
+    }
+  } catch (error: any) {
+    console.log(error);
+    return res.status(400).json({ message: error.message });
+  }
+}
+
+export async function validateUserAsOrganizationMember(
+  req: Request,
+  res: Response,
+  next: NextFunction
+) {
+  try {
+    const user = req.user;
+    const { organizationId } = req.params;
+    const organization = await OrganizationService.getOrganizationById(
+      organizationId as unknown as Types.ObjectId
+    );
+    const organizationService = new OrganizationService(
+      organization as unknown as IOrganization
+    );
+
+    if (
+      organization.teachers.includes(user._id) ||
+      organization.students.includes(user._id)
+    ) {
+      next();
+    } else {
+      return res.status(401).json({
+        message: "Access Denied. User needs to be organization's member",
       });
     }
   } catch (error: any) {

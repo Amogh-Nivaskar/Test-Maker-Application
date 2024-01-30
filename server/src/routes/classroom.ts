@@ -3,32 +3,29 @@ import { validateUserAuthentication } from "../middleware/authentication";
 import {
   createClassroom,
   createTest,
+  getTests,
   sendClassroomInvite,
 } from "../controllers/classroom";
 import {
   validateCreateTestAuthorization,
   validateCreatingClassroomAuthorization,
   validateSendingClassroomInviteAuthorization,
+  validateUserAsClassroomMember,
 } from "../middleware/roleValidation/classroom";
 
 const router = express.Router({ mergeParams: true });
 
-router.post(
-  "/",
-  validateUserAuthentication,
-  validateCreatingClassroomAuthorization,
-  createClassroom
-);
+router.post("/", validateCreatingClassroomAuthorization, createClassroom);
+router.get("/:classroomId/tests", validateUserAsClassroomMember, getTests);
+
 router.post(
   "/:classroomId/sendInvite",
-  validateUserAuthentication,
   validateSendingClassroomInviteAuthorization,
   sendClassroomInvite
 );
 
 router.post(
   "/:classroomId/createTest",
-  validateUserAuthentication,
   validateCreateTestAuthorization,
   createTest
 );

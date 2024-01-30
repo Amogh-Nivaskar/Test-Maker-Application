@@ -3,24 +3,32 @@ import { validateUserAuthentication } from "../middleware/authentication";
 import {
   createOrganization,
   createTable,
+  getClassrooms,
+  getOrganizationRole,
   sendOrganizationInvite,
 } from "../controllers/organization";
-import { validateSendingOrganizationInviteAuthorization } from "../middleware/roleValidation/organization";
+import {
+  validateUserAsAdmin,
+  validateUserAsOrganizationMember,
+} from "../middleware/roleValidation/organization";
 
 const router = express.Router();
 
-router.post("/", validateUserAuthentication, createOrganization);
+router.get(
+  "/:organizationId/classrooms",
+  validateUserAsOrganizationMember,
+  getClassrooms
+);
+
+router.get("/:organizationId/role", getOrganizationRole);
+
+router.post("/", createOrganization);
 router.post(
   "/sendInvite/:organizationId",
-  validateUserAuthentication,
-  validateSendingOrganizationInviteAuthorization,
+  validateUserAsAdmin,
   sendOrganizationInvite
 );
 
-router.post(
-  "/:organizationId/createTable",
-  validateUserAuthentication,
-  createTable
-);
+router.post("/:organizationId/createTable", createTable);
 
 export default router;

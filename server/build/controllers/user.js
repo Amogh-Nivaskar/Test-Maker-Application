@@ -12,21 +12,53 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.evaluateTestResponses = exports.submitTestResponse = exports.answerTestQuestion = exports.startGivingTest = exports.acceptClassroomInvite = exports.acceptOrganizationInvite = exports.checkAuthStatus = exports.signinWithEmailAndPassword = exports.signupWithEmailAndPassword = void 0;
+exports.acceptClassroomInvite = exports.acceptOrganizationInvite = exports.getOrganizations = exports.checkAuthStatus = exports.signin = exports.signup = exports.userExists = exports.ACCESS_TOKEN = void 0;
 const user_1 = __importDefault(require("../services/user"));
-const test_1 = __importDefault(require("../services/test"));
-const testStatus_1 = require("../utils/enums/testStatus");
-const response_1 = require("../services/response");
-const answer_1 = require("../services/answer");
-const responseStatus_1 = require("../utils/enums/responseStatus");
-function signupWithEmailAndPassword(req, res) {
+exports.ACCESS_TOKEN = "__Access_Token__";
+function userExists(req, res) {
     return __awaiter(this, void 0, void 0, function* () {
         try {
-            const { name, email, password } = req.body;
-            const payload = yield user_1.default.signupWithEmailAndPassword(name, email, password);
+            const email = req.query.email;
+            const existingUser = yield user_1.default.getUserByEmail(email);
             return res
-                .status(201)
-                .json({ message: "User Signed Up Successfully", payload });
+                .status(200)
+                .json({ message: "Checked User Successfully", existingUser });
+        }
+        catch (error) {
+            console.log(error);
+            return res.status(400).json({
+                message: "Something went wrong in checking if user already exists",
+            });
+        }
+    });
+}
+exports.userExists = userExists;
+// export async function signupWithEmailAndPassword(req: Request, res: Response) {
+//   try {
+//     const { name, email, password } = req.body;
+//     const payload = await UserService.signupWithEmailAndPassword(
+//       name,
+//       email,
+//       password
+//     );
+//     return res
+//       .status(201)
+//       .json({ message: "User Signed Up Successfully", payload });
+//   } catch (error: any) {
+//     console.log("Error in sign up: ", error.message);
+//     return res.status(400).json({ message: error.message });
+//   }
+// }
+function signup(req, res) {
+    return __awaiter(this, void 0, void 0, function* () {
+        try {
+            const { email, password, provider } = req.body;
+            const payload = yield user_1.default.signUp(email, email, provider, password);
+            return res.status(201).json({
+                message: "User Signed Up Successfull",
+                user: payload === null || payload === void 0 ? void 0 : payload.user,
+                accessToken: payload === null || payload === void 0 ? void 0 : payload.accessToken,
+            });
         }
         catch (error) {
             console.log("Error in sign up: ", error.message);
@@ -34,15 +66,18 @@ function signupWithEmailAndPassword(req, res) {
         }
     });
 }
-exports.signupWithEmailAndPassword = signupWithEmailAndPassword;
-function signinWithEmailAndPassword(req, res) {
+exports.signup = signup;
+function signin(req, res) {
     return __awaiter(this, void 0, void 0, function* () {
         try {
             const { email, password } = req.body;
             const payload = yield user_1.default.signinWithEmailAndPassword(email, password);
-            return res
-                .status(200)
-                .json({ message: "User Signed In Successfully", payload });
+            res.cookie(exports.ACCESS_TOKEN, payload === null || payload === void 0 ? void 0 : payload.accessToken);
+            return res.status(200).json({
+                message: "User Signed In Successfully",
+                user: payload === null || payload === void 0 ? void 0 : payload.user,
+                accessToken: payload === null || payload === void 0 ? void 0 : payload.accessToken,
+            });
         }
         catch (error) {
             console.log(error);
@@ -50,7 +85,7 @@ function signinWithEmailAndPassword(req, res) {
         }
     });
 }
-exports.signinWithEmailAndPassword = signinWithEmailAndPassword;
+exports.signin = signin;
 function checkAuthStatus(req, res) {
     return __awaiter(this, void 0, void 0, function* () {
         try {
@@ -58,7 +93,7 @@ function checkAuthStatus(req, res) {
             if (user) {
                 return res
                     .status(200)
-                    .json({ message: "User is currently logged in", data: user });
+                    .json({ message: "User is currently logged in", user });
             }
             else {
                 return res.status(401).json({ message: "User is not logged in" });
@@ -73,6 +108,27 @@ function checkAuthStatus(req, res) {
     });
 }
 exports.checkAuthStatus = checkAuthStatus;
+function getOrganizations(req, res) {
+    return __awaiter(this, void 0, void 0, function* () {
+        try {
+            const { _id } = req.user;
+            // PATCHUP
+            const user = (yield user_1.default.getUserById(_id));
+            if (!user)
+                throw new Error("User not found");
+            const userService = new user_1.default(user);
+            const organizations = yield userService.getOrganizations();
+            return res
+                .status(201)
+                .json({ message: "Successfully fetched organizations", organizations });
+        }
+        catch (error) {
+            console.log(error);
+            return res.status(400).json({ message: error.message });
+        }
+    });
+}
+exports.getOrganizations = getOrganizations;
 function acceptOrganizationInvite(req, res) {
     return __awaiter(this, void 0, void 0, function* () {
         try {
@@ -116,103 +172,4 @@ function acceptClassroomInvite(req, res) {
     });
 }
 exports.acceptClassroomInvite = acceptClassroomInvite;
-function startGivingTest(req, res) {
-    return __awaiter(this, void 0, void 0, function* () {
-        try {
-            const user = req.user;
-            const { testId } = req.params;
-            if (yield response_1.ResponseService.checkIfStudentHasTestResponse(user._id, testId)) {
-                return res.status(400).json({
-                    message: "Student already has a response to this test. Cannot create another response",
-                });
-            }
-            const test = yield test_1.default.getTestById(testId);
-            if (test.status === testStatus_1.TestStatus.Inactive) {
-                return res.status(401).json({ message: "Test is inactive" });
-            }
-            const response = yield response_1.ResponseService.createResponse(user._id, testId);
-            return res.status(201).json({
-                message: "Successfully Created Response",
-                responseId: response._id,
-            });
-        }
-        catch (error) {
-            console.log(error);
-            return res.status(400).json({ message: error.message });
-        }
-    });
-}
-exports.startGivingTest = startGivingTest;
-function answerTestQuestion(req, res) {
-    return __awaiter(this, void 0, void 0, function* () {
-        try {
-            const user = req.user;
-            const { testId, responseId, answerId } = req.params;
-            const { answer } = req.body;
-            const test = yield test_1.default.getTestById(testId);
-            if (test.status === testStatus_1.TestStatus.Inactive) {
-                return res.status(401).json({ message: "Test is inactive" });
-            }
-            const response = yield response_1.ResponseService.getResponseById(responseId);
-            if (response.status !== responseStatus_1.ResponseStatus.Ongoing) {
-                return res
-                    .status(400)
-                    .json({ message: "Response has already been submitted" });
-            }
-            const answerModel = yield answer_1.AnswerService.getAnswerById(answerId);
-            const answerService = new answer_1.AnswerService(answerModel);
-            yield answerService.updateAnswer(answer);
-            return res.status(201).json({ message: "Successfully Updated Answer" });
-        }
-        catch (error) {
-            console.log(error);
-            return res.status(400).json({ message: error.message });
-        }
-    });
-}
-exports.answerTestQuestion = answerTestQuestion;
-function submitTestResponse(req, res) {
-    return __awaiter(this, void 0, void 0, function* () {
-        try {
-            const user = req.user;
-            const { testId, responseId, answerId } = req.params;
-            const test = yield test_1.default.getTestById(testId);
-            if (test.status === testStatus_1.TestStatus.Inactive) {
-                return res.status(401).json({ message: "Test is inactive" });
-            }
-            const response = yield response_1.ResponseService.getResponseById(responseId);
-            if (response.status !== responseStatus_1.ResponseStatus.Ongoing) {
-                return res
-                    .status(400)
-                    .json({ message: "Response has already been submitted" });
-            }
-            const responseService = new response_1.ResponseService(response);
-            yield responseService.submitResponse();
-            return res.status(201).json({ message: "Successfully Submitted Response" });
-        }
-        catch (error) {
-            console.log(error);
-            return res.status(400).json({ message: error.message });
-        }
-    });
-}
-exports.submitTestResponse = submitTestResponse;
-function evaluateTestResponses(req, res) {
-    return __awaiter(this, void 0, void 0, function* () {
-        try {
-            const { testId } = req.params;
-            const test = yield test_1.default.getTestById(testId);
-            const testService = new test_1.default(test);
-            yield testService.evaluateTestResponses();
-            return res
-                .status(201)
-                .json({ messsage: "Successfully evaluated test responses" });
-        }
-        catch (error) {
-            console.log(error);
-            return res.status(400).json({ message: error.message });
-        }
-    });
-}
-exports.evaluateTestResponses = evaluateTestResponses;
 //# sourceMappingURL=user.js.map

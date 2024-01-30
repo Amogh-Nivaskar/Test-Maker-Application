@@ -12,10 +12,10 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.validateSendingOrganizationInviteAuthorization = void 0;
+exports.validateUserAsOrganizationMember = exports.validateUserAsAdmin = void 0;
 const organization_1 = __importDefault(require("../../services/organization"));
 const roles_1 = require("../../utils/enums/roles");
-function validateSendingOrganizationInviteAuthorization(req, res, next) {
+function validateUserAsAdmin(req, res, next) {
     return __awaiter(this, void 0, void 0, function* () {
         try {
             const user = req.user;
@@ -38,5 +38,29 @@ function validateSendingOrganizationInviteAuthorization(req, res, next) {
         }
     });
 }
-exports.validateSendingOrganizationInviteAuthorization = validateSendingOrganizationInviteAuthorization;
+exports.validateUserAsAdmin = validateUserAsAdmin;
+function validateUserAsOrganizationMember(req, res, next) {
+    return __awaiter(this, void 0, void 0, function* () {
+        try {
+            const user = req.user;
+            const { organizationId } = req.params;
+            const organization = yield organization_1.default.getOrganizationById(organizationId);
+            const organizationService = new organization_1.default(organization);
+            if (organization.teachers.includes(user._id) ||
+                organization.students.includes(user._id)) {
+                next();
+            }
+            else {
+                return res.status(401).json({
+                    message: "Access Denied. User needs to be organization's member",
+                });
+            }
+        }
+        catch (error) {
+            console.log(error);
+            return res.status(400).json({ message: error.message });
+        }
+    });
+}
+exports.validateUserAsOrganizationMember = validateUserAsOrganizationMember;
 //# sourceMappingURL=organization.js.map

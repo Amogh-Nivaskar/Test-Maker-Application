@@ -3,6 +3,44 @@ import { Response, Request } from "express";
 import OrganizationService from "../services/organization";
 import { IOrganization } from "../interfaces/organization";
 
+export async function getClassrooms(req: Request, res: Response) {
+  try {
+    const { organizationId } = req.params;
+    const organization = await OrganizationService.getOrganizationById(
+      organizationId as unknown as Types.ObjectId
+    );
+
+    const organizationService = new OrganizationService(organization);
+    const classrooms = await organizationService.getClassrooms();
+    return res
+      .status(201)
+      .json({ message: "Fetched classrooms successfully", classrooms });
+  } catch (error: any) {
+    console.log(error);
+    return res.status(400).json({ message: error.message });
+  }
+}
+
+export async function getOrganizationRole(req: Request, res: Response) {
+  try {
+    const user = req.user;
+    const { organizationId } = req.params;
+    const organization = await OrganizationService.getOrganizationById(
+      organizationId as unknown as Types.ObjectId
+    );
+
+    const organizationService = new OrganizationService(organization);
+
+    const role = await organizationService.getOrganizationRole(user._id);
+    return res
+      .status(201)
+      .json({ message: "Fetched organization role successfully", role });
+  } catch (error: any) {
+    console.log(error);
+    return res.status(400).json({ message: error.message });
+  }
+}
+
 export async function createOrganization(req: Request, res: Response) {
   try {
     const user = req.user;

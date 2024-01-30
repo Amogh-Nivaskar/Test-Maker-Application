@@ -9,6 +9,7 @@ import { IInvite } from "../interfaces/invite";
 import { ClassroomModel } from "../models/classroom";
 import { ObjectId } from "mongodb";
 import { IClassroom } from "../interfaces/classroom";
+import { ProviderTypes } from "../utils/enums/providerTypes";
 
 export interface UserJWTPayload {
   _id: Types.ObjectId;
@@ -19,6 +20,7 @@ export interface UserJWTPayload {
 class UserService implements IUser {
   _id: Types.ObjectId;
   name: string;
+  provider: string;
   email: string;
   password: string;
   ownedOrganizations: Array<IOrganization> | Array<IOrganization["_id"]>;
@@ -29,6 +31,7 @@ class UserService implements IUser {
   public constructor(user: IUser) {
     this._id = user._id;
     this.name = user.name;
+    this.provider = user.provider;
     this.email = user.email;
     this.password = user.password;
     this.ownedOrganizations = user.ownedOrganizations;
@@ -48,21 +51,51 @@ class UserService implements IUser {
     return user;
   }
 
-  public static async signupWithEmailAndPassword(
+  public static async signUp(
     name: string,
     email: string,
-    password: string
+    provider: string,
+    password?: string
+  ) {
+    if (provider === ProviderTypes.Google) {
+      const user = new UserModel({ name, email, provider });
+      await user.save();
+      const accessToken = this.generateAccessToken(email);
+      return {
+        user: { _id: user?._id, name: user?.name, email: user?.email },
+        accessToken,
+      };
+    } else if (provider === ProviderTypes.Credentials) {
+      if (!password) throw new Error("Password not found");
+      const { user, accessToken } = await this.signupWithEmailAndPassword(
+        name,
+        email,
+        password,
+        provider
+      );
+      return {
+        user: { _id: user?._id, name: user?.name, email: user?.email },
+        accessToken,
+      };
+    }
+  }
+
+  private static async signupWithEmailAndPassword(
+    name: string,
+    email: string,
+    password: string,
+    provider: string
   ) {
     const existingUser = await this.getUserByEmail(email);
     if (existingUser) throw new Error(`User by this email already exists`);
 
-    const user = new UserModel({ name, email, password });
+    const user = new UserModel({ name, email, password, provider });
 
     await user.save();
 
     const accessToken = await this.generateAccessToken(email);
 
-    return { accessToken, id: user._id, name, email };
+    return { user, accessToken };
   }
 
   public static async signinWithEmailAndPassword(
@@ -72,17 +105,23 @@ class UserService implements IUser {
     const existingUser = await this.getUserByEmail(email);
     if (!existingUser) throw new Error("No user with given email ID");
 
-    if (existingUser.password !== password) {
-      throw new Error("Incorrect email or password");
+    if (
+      existingUser.provider === ProviderTypes.Credentials &&
+      existingUser.password !== password
+    ) {
+      // throw new Error("Incorrect email or password");
+      return null;
     }
 
     const accessToken = await this.generateAccessToken(email);
 
     return {
+      user: {
+        _id: existingUser?._id,
+        name: existingUser?.name,
+        email: existingUser?.email,
+      },
       accessToken,
-      id: existingUser._id,
-      email,
-      name: existingUser.name,
     };
   }
 
@@ -117,6 +156,12 @@ class UserService implements IUser {
     } catch (error) {
       return null;
     }
+  }
+
+  public async getOrganizations() {
+    const user = await UserModel.findById(this._id).populate("organizations");
+    if (!user) throw new Error("User doesnt exist");
+    return user.organizations;
   }
 
   public async acceptOrganizationInvite(
