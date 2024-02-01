@@ -3,7 +3,7 @@ import { getTest } from "@/services/test";
 import React, { useState, useEffect } from "react";
 import { useSelector } from "react-redux";
 
-export default function useResponses(
+export default function useResponsesFromStudents(
   testId: string,
   classroomId: string,
   organizationId: string

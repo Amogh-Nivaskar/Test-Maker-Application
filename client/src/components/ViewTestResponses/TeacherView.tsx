@@ -2,7 +2,7 @@
 import React, { useState } from "react";
 import DisplayAnswer, { IAnswer, IQuestion } from "./DisplayAnswer";
 import { Button } from "../ui/button";
-import useResponses from "@/hooks/useResponses";
+import useResponsesFromStudents from "@/hooks/useResponses";
 
 export default function TeacherView({
   testId,
@@ -14,7 +14,7 @@ export default function TeacherView({
   classroomId: string;
 }) {
   const [responseIdx, setResponseIdx] = useState<number>(0);
-  const { loading, questions, responses } = useResponses(
+  const { loading, questions, responses } = useResponsesFromStudents(
     testId,
     classroomId,
     organizationId
