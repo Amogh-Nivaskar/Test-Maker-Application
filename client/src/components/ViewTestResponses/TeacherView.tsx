@@ -1,9 +1,8 @@
 "use client";
-
-import { selectUser } from "@/redux/slices/user";
-import { getTest } from "@/services/test";
-import React, { useState, useEffect } from "react";
-import { useSelector } from "react-redux";
+import React, { useState } from "react";
+import DisplayAnswer, { IAnswer, IQuestion } from "./DisplayAnswer";
+import { Button } from "../ui/button";
+import useResponses from "@/hooks/useResponses";
 
 export default function TeacherView({
   testId,
@@ -14,31 +13,54 @@ export default function TeacherView({
   organizationId: string;
   classroomId: string;
 }) {
-  const [questions, setQuestions] = useState<any[]>([]);
-  const [responses, setResponses] = useState<any[]>([]);
+  const [responseIdx, setResponseIdx] = useState<number>(0);
+  const { loading, questions, responses } = useResponses(
+    testId,
+    classroomId,
+    organizationId
+  );
+  function goToPrev() {
+    if (responseIdx > 0) setResponseIdx(responseIdx - 1);
+  }
 
-  const user = useSelector(selectUser);
+  function goToNext() {
+    if (responseIdx < responses.length - 1) setResponseIdx(responseIdx + 1);
+  }
 
-  useEffect(() => {
-    async function getTestHelper() {
-      const data = await getTest(
-        organizationId,
-        classroomId,
-        testId,
-        user?.email
-      );
-      console.log(data);
-      setQuestions(data?.questions);
-      setResponses(data?.responses);
-    }
-    getTestHelper();
-  }, [organizationId, classroomId, testId, user.email]);
+  if (loading) return <span>Loading</span>;
 
   return (
-    <div>
-      {questions.map((q: any, idx: number) => (
-        <div key={idx}> {q.statement} </div>
-      ))}
+    <div className="flex flex-col gap-2">
+      <span className="italic font-semibold">
+        Student: {responses[responseIdx]?.givenBy.name}
+      </span>
+      <div className="flex flex-col gap-3">
+        {questions.map((question: IQuestion, idx: number) => {
+          const questionStatement = question?.statement;
+          const answerObj = responses[responseIdx].answers.find(
+            (answer: IAnswer) => answer.question === question._id
+          );
+          return (
+            <div
+              className="flex flex-col gap-1 border border-black p-2"
+              key={idx}
+            >
+              <DisplayAnswer questionObj={question} answerObj={answerObj} />
+            </div>
+          );
+        })}
+      </div>
+      <div className="flex justify-between">
+        <Button disabled={responseIdx === 0} onClick={goToPrev}>
+          Prev
+        </Button>
+        <Button
+          disabled={responseIdx === responses.length - 1}
+          onClick={goToNext}
+        >
+          Next
+        </Button>
+      </div>
     </div>
   );
 }
